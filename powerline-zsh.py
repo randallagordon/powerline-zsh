@@ -16,6 +16,9 @@ class Color:
     # The following link is a pretty good resources for color values:
     # http://www.calmar.ws/vim/color-output.png
 
+    USER_HOST_FG = 244
+    USER_HOST_BG = 237
+
     PATH_BG = 237  # dark grey
     PATH_FG = 250  # light grey
     CWD_FG = 254  # nearly-white grey
@@ -108,6 +111,11 @@ class Segment:
             separator_bg,
             powerline.fgcolor(self.separator_fg),
             self.separator))
+
+
+def add_user_host_segment(powerline):
+    powerline.append(Segment(powerline, '%n@%m ', Color.USER_HOST_FG,
+                     Color.USER_HOST_BG, p.separator_thin, Color.SEPARATOR_FG))
 
 
 def add_cwd_segment(powerline, cwd, maxdepth, cwd_only=False):
@@ -206,12 +214,12 @@ def add_git_segment(powerline, cwd):
     has_pending_commits, has_untracked_files, origin_position, detached_head, current_branch = get_git_status()
 
     if len(current_branch) > 0:
-      branch = current_branch
+        branch = current_branch
     elif detached_head:
-       branch = subprocess.Popen(['git', 'describe', '--all', '--contains', '--abbrev=4', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-       branch = '((' + branch.communicate()[0].strip() + '))'
+        branch = subprocess.Popen(['git', 'describe', '--all', '--contains', '--abbrev=4', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        branch = '((' + branch.communicate()[0].strip() + '))'
     else:
-      return 'master'
+        return 'master'
 
     branch += origin_position
 
@@ -318,6 +326,7 @@ def get_valid_cwd():
         warn("Your current directory is invalid. Lowest valid directory: " + up)
     return cwd
 
+
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--cwd-only', action="store_true")
@@ -325,8 +334,7 @@ if __name__ == '__main__':
     args = arg_parser.parse_args()
 
     p = Powerline(mode='default')
-    p.append(Segment(p, '%n@%m ', Color.CWD_FG, Color.PATH_BG,
-             p.separator_thin, Color.SEPARATOR_FG))
+    add_user_host_segment(p)
     cwd = get_valid_cwd()
     add_virtual_env_segment(p, cwd)
     #p.append(Segment(' \\u ', 250, 240))
