@@ -26,10 +26,15 @@ class Color:
     REPO_DIRTY_BG = 161  # pink/red
     REPO_DIRTY_FG = 15  # white
 
-    CMD_PASSED_BG = 236
-    CMD_PASSED_FG = 15
+    CMD_PASSED_BG = 10
+    CMD_PASSED_FG = 22
     CMD_FAILED_BG = 161
     CMD_FAILED_FG = 15
+
+    VI_INSERT_BG = 31
+    VI_INSERT_FG = 117
+    VI_COMMAND_BG = CMD_PASSED_BG
+    VI_COMMAND_FG = CMD_PASSED_FG
 
     SVN_CHANGES_BG = 148
     SVN_CHANGES_FG = 22  # dark green
@@ -282,10 +287,17 @@ def add_virtual_env_segment(powerline, cwd):
 def add_root_indicator(powerline, error):
     bg = Color.CMD_PASSED_BG
     fg = Color.CMD_PASSED_FG
-    if int(error) != 0:
-        fg = Color.CMD_FAILED_FG
+    vimode = os.getenv('VIMODE', '')
+    if vimode.startswith("command"):  # Normal Mode = Green
+        bg = Color.VI_COMMAND_BG
+        fg = Color.VI_COMMAND_FG
+    elif vimode.startswith("insert"):  # Insert Mode = Blue
+        bg = Color.VI_INSERT_BG
+        fg = Color.VI_INSERT_FG
+    elif int(error) != 0:
         bg = Color.CMD_FAILED_BG
-    powerline.append(Segment(powerline, ' $ ', fg, bg))
+        fg = Color.CMD_FAILED_FG
+    powerline.append(Segment(powerline, ' $', fg, bg))
 
 
 def get_valid_cwd():
@@ -313,6 +325,8 @@ if __name__ == '__main__':
     args = arg_parser.parse_args()
 
     p = Powerline(mode='default')
+    p.append(Segment(p, '%n@%m ', Color.CWD_FG, Color.PATH_BG,
+             p.separator_thin, Color.SEPARATOR_FG))
     cwd = get_valid_cwd()
     add_virtual_env_segment(p, cwd)
     #p.append(Segment(' \\u ', 250, 240))
