@@ -26,7 +26,7 @@ class Color:
     REPO_DIRTY_BG = 161  # pink/red
     REPO_DIRTY_FG = 15  # white
 
-    CMD_PASSED_BG = 10
+    CMD_PASSED_BG = 70
     CMD_PASSED_FG = 22
     CMD_FAILED_BG = 161
     CMD_FAILED_FG = 15
